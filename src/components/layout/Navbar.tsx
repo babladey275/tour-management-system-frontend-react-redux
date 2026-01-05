@@ -9,6 +9,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -26,8 +27,8 @@ const navigationLinks = [
 export default function Navbar() {
   const desktopLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "inline-flex items-center rounded-xl px-3 py-2 text-sm font-medium transition",
-      "text-muted-foreground hover:bg-muted hover:text-foreground",
+      "inline-flex items-center rounded-sm px-3 py-2 text-sm font-medium transition",
+      "text-muted-foreground hover:bg-muted hover:text-primary",
       isActive && "bg-muted text-foreground"
     );
 
@@ -66,23 +67,9 @@ export default function Navbar() {
 
           <div className="flex items-center gap-2">
             <ModeToggle />
-
-            <Link
-              to="/login"
-              className="rounded-xl px-4 py-2 text-sm font-medium text-foreground/80 hover:bg-muted hover:text-foreground transition"
-            >
-              Login
-            </Link>
-
-            <Link
-              to="/register"
-              className={cn(
-                "rounded-xl px-5 py-2 text-sm font-semibold text-white shadow-sm transition",
-                "bg-linear-to-r from-teal-600 to-emerald-600 hover:to-emerald-700"
-              )}
-            >
-              Register
-            </Link>
+            <Button asChild className="text-sm">
+              <Link to="/login">Login</Link>
+            </Button>
           </div>
         </div>
 
@@ -122,8 +109,13 @@ export default function Navbar() {
                     </Link>
                   </SheetClose>
 
-                  {/* Optional title (screen reader + accessibility) */}
-                  <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
+                  {/* Title for accessibility */}
+                  <SheetTitle className="sr-only">Mobile menu</SheetTitle>
+
+                  {/* Add Description to remove Radix warning */}
+                  <SheetDescription className="sr-only">
+                    Navigation links and login action.
+                  </SheetDescription>
                 </div>
               </SheetHeader>
 
@@ -148,21 +140,12 @@ export default function Navbar() {
 
                   <div className="grid gap-2">
                     <SheetClose asChild>
-                      <Link
-                        to="/login"
-                        className="rounded-2xl border border-border px-4 py-3 text-center text-sm font-semibold hover:bg-muted transition"
+                      <Button
+                        asChild
+                        className="rounded-2xl py-3 text-sm font-semibold shadow-sm"
                       >
-                        Login
-                      </Link>
-                    </SheetClose>
-
-                    <SheetClose asChild>
-                      <Link
-                        to="/register"
-                        className="rounded-2xl bg-linear-to-r from-teal-600 to-emerald-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm hover:to-emerald-700 transition"
-                      >
-                        Register
-                      </Link>
+                        <Link to="/login">Login</Link>
+                      </Button>
                     </SheetClose>
                   </div>
                 </nav>
