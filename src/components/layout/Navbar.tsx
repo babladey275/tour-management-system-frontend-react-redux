@@ -13,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ModeToggle } from "./ModeToggler";
 
 // Single source of truth for routes (desktop + mobile)
 const navigationLinks = [
@@ -55,7 +56,7 @@ export default function Navbar() {
               <NavLink
                 key={item.to}
                 to={item.to}
-                end={item.to === "/"} // ✅ only exact "/" active
+                end={item.to === "/"}
                 className={desktopLinkClass}
               >
                 {item.label}
@@ -63,8 +64,9 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Actions */}
           <div className="flex items-center gap-2">
+            <ModeToggle />
+
             <Link
               to="/login"
               className="rounded-xl px-4 py-2 text-sm font-medium text-foreground/80 hover:bg-muted hover:text-foreground transition"
@@ -84,8 +86,10 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Hamburger (shadcn Sheet) */}
-        <div className="md:hidden">
+        {/* Mobile right side (ModeToggle + Hamburger) */}
+        <div className="flex items-center gap-2 md:hidden">
+          <ModeToggle />
+
           <Sheet>
             <SheetTrigger asChild>
               <Button
