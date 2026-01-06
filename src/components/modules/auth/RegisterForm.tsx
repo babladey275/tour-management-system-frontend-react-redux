@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Password from "@/components/ui/Password";
@@ -50,6 +50,7 @@ export function RegisterForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
+  const navigate = useNavigate();
   const [register] = useRegisterMutation();
 
   const form = useForm<z.infer<typeof registerSchema>>({
@@ -72,6 +73,7 @@ export function RegisterForm({
       const result = await register(userInfo).unwrap();
       console.log(result);
       toast.success("User Created Successfully");
+      navigate("/verify");
     } catch (error) {
       console.log(error);
     }
