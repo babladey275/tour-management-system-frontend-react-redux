@@ -15,6 +15,8 @@ import { Link } from "react-router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Password from "@/components/ui/Password";
+import { useRegisterMutation } from "@/redux/features/auth/auth.api";
+import { toast } from "sonner";
 
 const registerSchema = z
   .object({
@@ -25,10 +27,19 @@ const registerSchema = z
     email: z.email(),
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters" }),
+      .min(8, { message: "Password must be at least 8 characters" })
+      .regex(/[A-Z]/, {
+        message: "Password must contain at least 1 uppercase letter.",
+      })
+      .regex(/\d/, {
+        message: "Password must contain at least 1 number.",
+      })
+      .regex(/[^A-Za-z0-9]/, {
+        message: "Password must contain at least 1 special character.",
+      }),
     confirmPassword: z
       .string()
-      .min(8, { error: "Confirm password must be at least 8 characters" }),
+      .min(8, { message: "Confirm password must be at least 8 characters" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Password do not match",
@@ -39,6 +50,8 @@ export function RegisterForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
+  const [register] = useRegisterMutation();
+
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -55,7 +68,13 @@ export function RegisterForm({
       email: data.email,
       password: data.password,
     };
-    console.log(userInfo);
+    try {
+      const result = await register(userInfo).unwrap();
+      console.log(result);
+      toast.success("User Created Successfully");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
