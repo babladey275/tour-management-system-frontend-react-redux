@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,104 +29,147 @@ import {
 } from "@/redux/features/auth/auth.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dot } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 
+const OTP_EXPIRE_SECONDS = 120;
+
 const FormSchema = z.object({
-  pin: z.string().min(6, {
-    message: "Your one-time password must be 6 characters.",
-  }),
+  pin: z.string().length(6, "OTP must be 6 digits"),
 });
+
+const formatTime = (seconds: number) => {
+  const min = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+};
 
 export default function Verify() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [email] = useState(location.state);
-  const [confirmed, setConfirmed] = useState(false);
+
+  const email = useMemo(() => {
+    return (location.state as string | undefined) ?? "";
+  }, [location.state]);
+
+  const [otpSent, setOtpSent] = useState(false);
+  const [timer, setTimer] = useState(0);
+
+  const otpExpired = otpSent && timer === 0;
+
+  // const expiredToastShownRef = useRef(false);
+
   const [sendOtp] = useSendOtpMutation();
   const [verifyOtp] = useVerifyOtpMutation();
-  const [timer, setTimer] = useState(5);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      pin: "",
-    },
+    defaultValues: { pin: "" },
   });
 
+  //! Needed - Turned off for development
+  useEffect(() => {
+    if (!email) {
+      navigate("/");
+    }
+  }, [email, navigate]);
+
+  // countdown
+  useEffect(() => {
+    if (!otpSent) return;
+    if (timer <= 0) return;
+
+    const timerId = setInterval(() => {
+      setTimer((prev) => prev - 1);
+      // console.log("Tick");
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [otpSent, timer]);
+
+  // show toast once when expired
+  // useEffect(() => {
+  //   if (!otpSent) return;
+
+  //   if (timer === 0 && !expiredToastShownRef.current) {
+  //     expiredToastShownRef.current = true;
+  //     toast.error("OTP expired. Please resend OTP.");
+  //   }
+
+  //   // reset the "shown" flag whenever timer is reset above 0
+  //   if (timer > 0) {
+  //     expiredToastShownRef.current = false;
+  //   }
+  // }, [otpSent, timer]);
+
   const handleSendOtp = async () => {
-    const toastId = toast.loading("Sending OTP");
+    if (!email) {
+      toast.error("Email not found");
+      return;
+    }
+
+    const toastId = toast.loading("Sending OTP...");
 
     try {
-      const res = await sendOtp({ email: email }).unwrap();
+      const res = await sendOtp({ email }).unwrap();
 
-      if (res.success) {
+      if (res?.success) {
         toast.success("OTP Sent", { id: toastId });
-        setConfirmed(true);
-        setTimer(5);
+        setOtpSent(true);
+        setTimer(OTP_EXPIRE_SECONDS);
+        form.reset({ pin: "" });
+      } else {
+        toast.error("Failed to send OTP", { id: toastId });
       }
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      toast.error(err?.data?.message ?? "Failed to send OTP", { id: toastId });
     }
   };
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    const toastId = toast.loading("Verifying OTP");
-    const userInfo = {
-      email,
-      otp: data.pin,
-    };
-
-    try {
-      const res = await verifyOtp(userInfo).unwrap();
-      if (res.success) {
-        toast.success("OTP Verified", { id: toastId });
-        setConfirmed(true);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  //! Needed - Turned off for development
-  //   useEffect(() => {
-  //     if (!email) {
-  //       navigate("/");
-  //     }
-  //   }, [email]);
-
-  useEffect(() => {
-    if (!email || !confirmed) {
+    if (otpExpired) {
+      toast.error("OTP expired. Please resend OTP.");
       return;
     }
 
-    const timerId = setInterval(() => {
-      setTimer((prev) => (prev > 0 ? prev - 1 : 0));
-      console.log("Tick");
-    }, 1000);
+    const toastId = toast.loading("Verifying OTP...");
 
-    return () => clearInterval(timerId);
-  }, [email, confirmed]);
+    try {
+      const res = await verifyOtp({ email, otp: data.pin }).unwrap();
+
+      if (res?.success) {
+        toast.success("OTP Verified", { id: toastId });
+        navigate("/");
+      } else {
+        toast.error("Invalid OTP", { id: toastId });
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message ?? "OTP verification failed", {
+        id: toastId,
+      });
+    }
+  };
 
   return (
     <div className="grid place-content-center h-screen">
-      {confirmed ? (
+      {otpSent ? (
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Verify your email address</CardTitle>
             <CardDescription>
-              Please enter the 6-digit code we sent to <br /> {email}
+              Please enter the 6-digit code sent to <br /> {email}
             </CardDescription>
           </CardHeader>
+
           <CardContent>
             <Form {...form}>
               <form
                 id="otp-form"
                 onSubmit={form.handleSubmit(onSubmit)}
-                className=" space-y-6"
+                className="space-y-6"
               >
                 <FormField
                   control={form.control}
@@ -134,43 +178,49 @@ export default function Verify() {
                     <FormItem>
                       <FormLabel>One-Time Password</FormLabel>
                       <FormControl>
-                        <InputOTP maxLength={6} {...field}>
-                          <InputOTPGroup>
-                            <InputOTPSlot index={0} />
-                          </InputOTPGroup>
-                          <InputOTPGroup>
-                            <InputOTPSlot index={1} />
-                          </InputOTPGroup>
-                          <InputOTPGroup>
-                            <InputOTPSlot index={2} />
-                          </InputOTPGroup>
+                        <InputOTP
+                          maxLength={6}
+                          {...field}
+                          disabled={otpExpired}
+                        >
+                          {[0, 1, 2].map((i) => (
+                            <InputOTPGroup key={i}>
+                              <InputOTPSlot index={i} />
+                            </InputOTPGroup>
+                          ))}
                           <Dot />
-                          <InputOTPGroup>
-                            <InputOTPSlot index={3} />
-                          </InputOTPGroup>
-                          <InputOTPGroup>
-                            <InputOTPSlot index={4} />
-                          </InputOTPGroup>
-                          <InputOTPGroup>
-                            <InputOTPSlot index={5} />
-                          </InputOTPGroup>
+                          {[3, 4, 5].map((i) => (
+                            <InputOTPGroup key={i}>
+                              <InputOTPSlot index={i} />
+                            </InputOTPGroup>
+                          ))}
                         </InputOTP>
                       </FormControl>
-                      <FormDescription>
+
+                      <FormDescription className="flex items-center gap-2">
                         <Button
-                          onClick={handleSendOtp}
                           type="button"
                           variant="link"
+                          onClick={handleSendOtp}
                           disabled={timer !== 0}
                           className={cn("p-0 m-0", {
                             "cursor-pointer": timer === 0,
                             "text-gray-500": timer !== 0,
                           })}
                         >
-                          Resent OTP:{" "}
-                        </Button>{" "}
-                        {timer}
+                          Resend OTP:
+                        </Button>
+
+                        <span
+                          className={cn({
+                            "text-red-600": otpExpired || timer <= 10,
+                          })}
+                        >
+                          {/* {otpExpired ? "Expired" : formatTime(timer)} */}
+                          {formatTime(timer)}
+                        </span>
                       </FormDescription>
+
                       <FormMessage />
                     </FormItem>
                   )}
@@ -178,8 +228,9 @@ export default function Verify() {
               </form>
             </Form>
           </CardContent>
+
           <CardFooter className="flex justify-end">
-            <Button form="otp-form" type="submit">
+            <Button form="otp-form" type="submit" disabled={otpExpired}>
               Submit
             </Button>
           </CardFooter>
@@ -189,7 +240,7 @@ export default function Verify() {
           <CardHeader>
             <CardTitle className="text-xl">Verify your email address</CardTitle>
             <CardDescription>
-              We will send you an OTP at <br /> {email}
+              We will send an OTP to <br /> {email}
             </CardDescription>
           </CardHeader>
           <CardFooter className="flex justify-end">
