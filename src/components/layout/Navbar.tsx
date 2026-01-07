@@ -1,7 +1,7 @@
 import { Link, NavLink } from "react-router";
 import { Menu } from "lucide-react";
 
-import { cn } from "../../utils/cn";
+import { cn } from "@/lib/utils";
 import Logo from "@/assets/icons/Logo";
 
 import { Button } from "@/components/ui/button";
