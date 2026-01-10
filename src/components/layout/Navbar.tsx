@@ -25,8 +25,6 @@ import { useAppDispatch } from "@/redux/hooks";
 // Single source of truth for routes (desktop + mobile)
 const navigationLinks = [
   { to: "/", label: "Home" },
-  { to: "/features", label: "Features" },
-  { to: "/pricing", label: "Pricing" },
   { to: "/about", label: "About" },
 ];
 
