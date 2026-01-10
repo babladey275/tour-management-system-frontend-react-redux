@@ -8,6 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { config } from "@/config";
 import { cn } from "@/lib/utils";
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,7 +41,11 @@ export function LoginForm({
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     try {
       const res = await login(data).unwrap();
-      console.log(res);
+
+      if (res.success) {
+        toast.success("Logged in successfully");
+        navigate("/");
+      }
     } catch (err) {
       console.error(err);
       const error = err as FetchBaseQueryError;
@@ -116,8 +121,9 @@ export function LoginForm({
           type="button"
           variant="outline"
           className="w-full cursor-pointer"
+          asChild
         >
-          Login with Google
+          <a href={`${config.baseUrl}/auth/google`}>Login with Google</a>
         </Button>
       </div>
       <div className="text-center text-sm">

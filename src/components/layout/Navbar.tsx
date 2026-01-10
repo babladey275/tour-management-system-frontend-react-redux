@@ -15,6 +15,12 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ModeToggle } from "./ModeToggler";
+import {
+  authApi,
+  useLogoutMutation,
+  useUserInfoQuery,
+} from "@/redux/features/auth/auth.api";
+import { useAppDispatch } from "@/redux/hooks";
 
 // Single source of truth for routes (desktop + mobile)
 const navigationLinks = [
@@ -25,6 +31,17 @@ const navigationLinks = [
 ];
 
 export default function Navbar() {
+  const { data } = useUserInfoQuery(undefined);
+  const [logout] = useLogoutMutation();
+  const dispatch = useAppDispatch();
+  console.log("hello", data);
+  console.log(data?.data?.email);
+
+  const handleLogout = async () => {
+    await logout(undefined);
+    dispatch(authApi.util.resetApiState());
+  };
+
   const desktopLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
       "inline-flex items-center rounded-sm px-3 py-2 text-sm font-medium transition",
@@ -67,9 +84,20 @@ export default function Navbar() {
 
           <div className="flex items-center gap-2">
             <ModeToggle />
-            <Button asChild className="text-sm">
-              <Link to="/login">Login</Link>
-            </Button>
+            {data?.data?.email && (
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="text-sm"
+              >
+                Logout
+              </Button>
+            )}
+            {!data?.data?.email && (
+              <Button asChild className="text-sm">
+                <Link to="/login">Login</Link>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -140,12 +168,22 @@ export default function Navbar() {
 
                   <div className="grid gap-2">
                     <SheetClose asChild>
-                      <Button
-                        asChild
-                        className="rounded-2xl py-3 text-sm font-semibold shadow-sm"
-                      >
-                        <Link to="/login">Login</Link>
-                      </Button>
+                      {data?.data?.email ? (
+                        <Button
+                          onClick={handleLogout}
+                          variant="outline"
+                          className="text-sm"
+                        >
+                          Logout
+                        </Button>
+                      ) : (
+                        <Button
+                          asChild
+                          className="rounded-2xl w-full py-3 text-sm font-semibold shadow-sm"
+                        >
+                          <Link to="/login">Login</Link>
+                        </Button>
+                      )}
                     </SheetClose>
                   </div>
                 </nav>
