@@ -21,19 +21,21 @@ import {
   useUserInfoQuery,
 } from "@/redux/features/auth/auth.api";
 import { useAppDispatch } from "@/redux/hooks";
+import { role } from "@/constants/role";
 
 // Single source of truth for routes (desktop + mobile)
 const navigationLinks = [
-  { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
+  { to: "/", label: "Home", role: "PUBLIC" },
+  { to: "/about", label: "About", role: "PUBLIC" },
+  { to: "/admin", label: "Dashboard", role: role.admin },
+  { to: "/admin", label: "Dashboard", role: role.superAdmin },
+  { to: "/user", label: "Dashboard", role: role.user },
 ];
 
 export default function Navbar() {
   const { data } = useUserInfoQuery(undefined);
   const [logout] = useLogoutMutation();
   const dispatch = useAppDispatch();
-  console.log("hello", data);
-  console.log(data?.data?.email);
 
   const handleLogout = async () => {
     await logout(undefined);
@@ -68,16 +70,22 @@ export default function Navbar() {
             className="flex flex-wrap items-center gap-1"
             aria-label="Primary"
           >
-            {navigationLinks.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === "/"}
-                className={desktopLinkClass}
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {navigationLinks
+              .filter(
+                (link) =>
+                  link.role.includes("PUBLIC") ||
+                  link.role.includes(data?.data?.role)
+              )
+              .map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === "/"}
+                  className={desktopLinkClass}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
           </nav>
 
           <div className="flex items-center gap-2">
@@ -150,17 +158,23 @@ export default function Navbar() {
               {/* Scroll area */}
               <div className="max-h-[calc(100vh-76px-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto">
                 <nav className="p-3" aria-label="Mobile Primary">
-                  {navigationLinks.map((item) => (
-                    <SheetClose asChild key={item.to}>
-                      <NavLink
-                        to={item.to}
-                        end={item.to === "/"}
-                        className={mobileLinkClass}
-                      >
-                        {item.label}
-                      </NavLink>
-                    </SheetClose>
-                  ))}
+                  {navigationLinks
+                    .filter(
+                      (link) =>
+                        link.role.includes("PUBLIC") ||
+                        link.role.includes(data?.data?.role)
+                    )
+                    .map((item) => (
+                      <SheetClose asChild key={item.to}>
+                        <NavLink
+                          to={item.to}
+                          end={item.to === "/"}
+                          className={mobileLinkClass}
+                        >
+                          {item.label}
+                        </NavLink>
+                      </SheetClose>
+                    ))}
 
                   <div className="my-3 h-px w-full bg-border" />
 
