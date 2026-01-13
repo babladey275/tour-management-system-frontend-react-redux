@@ -24,7 +24,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const addTourTypeSchema = z.object({
-  name: z.string().min(1, { message: "Password is required" }),
+  name: z.string().min(1, { message: "Name is required" }),
 });
 
 export function AddTourTypeModal() {

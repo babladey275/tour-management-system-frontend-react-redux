@@ -34,7 +34,7 @@ export default function AddTourType() {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-5">
-      <div className="flex justify-between my-8">
+      <div className="flex justify-between mb-8">
         <h1 className="text-xl font-semibold">Tour Types</h1>
         <AddTourTypeModal />
       </div>

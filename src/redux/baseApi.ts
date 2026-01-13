@@ -8,6 +8,6 @@ export const baseApi = createApi({
   //   baseUrl: "abc.com",
   //   credentials: "include" //token set in cookie
   // }),
-  tagTypes: ["USER", "TOUR"],
+  tagTypes: ["USER", "TOUR", "DIVISION"],
   endpoints: () => ({}),
 });
