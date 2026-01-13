@@ -199,12 +199,13 @@ export default function AddTour() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-5">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-5">
       <Card>
         <CardHeader>
           <CardTitle>Add New Tour</CardTitle>
           <CardDescription>Add a new tour to the system</CardDescription>
         </CardHeader>
+
         <CardContent>
           <Form {...form}>
             <form
@@ -212,6 +213,7 @@ export default function AddTour() {
               className="space-y-5"
               onSubmit={form.handleSubmit(handleSubmit)}
             >
+              {/* Title */}
               <FormField
                 control={form.control}
                 name="title"
@@ -219,74 +221,85 @@ export default function AddTour() {
                   <FormItem>
                     <FormLabel>Tour Title</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input
+                        {...field}
+                        placeholder="e.g. Cox's Bazar Getaway"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <div className="flex gap-5">
+
+              {/* Location + Cost */}
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="location"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem>
                       <FormLabel>Location</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} placeholder="e.g. Cox's Bazar" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="costFrom"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem>
                       <FormLabel>Cost</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} placeholder="e.g. 5000" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              <div className="flex gap-5">
+
+              {/* Departure + Arrival */}
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="departureLocation"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem>
                       <FormLabel>Departure Location</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} placeholder="e.g. Dhaka" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="arrivalLocation"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem>
                       <FormLabel>Arrival Location</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} placeholder="e.g. Cox's Bazar" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              <div className="flex gap-5">
+
+              {/* Division + Tour Type */}
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="division"
                   render={({ field }) => (
-                    <FormItem className="flex-1 ">
+                    <FormItem>
                       <FormLabel>Division</FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -308,16 +321,16 @@ export default function AddTour() {
                           )}
                         </SelectContent>
                       </Select>
-
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="tourType"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem>
                       <FormLabel>Tour Type</FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -347,40 +360,45 @@ export default function AddTour() {
                   )}
                 />
               </div>
-              <div className="flex gap-5">
+
+              {/* Max Guest + Min Age */}
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="maxGuest"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem>
                       <FormLabel>Max Guest</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} placeholder="e.g. 20" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="minAge"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem>
                       <FormLabel>Minimum Age</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} placeholder="e.g. 12" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              <div className="flex gap-5">
+
+              {/* Dates */}
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="startDate"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col flex-1">
+                    <FormItem className="flex flex-col">
                       <FormLabel>Start Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -388,14 +406,14 @@ export default function AddTour() {
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-full pl-3 text-left font-normal",
+                                "w-full justify-start pl-3 text-left font-normal",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
                               {field.value ? (
                                 format(field.value, "PPP")
                               ) : (
-                                <span>Pick a date</span>
+                                <span>Pick a start date</span>
                               )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
@@ -404,7 +422,9 @@ export default function AddTour() {
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
-                            selected={new Date(field.value)}
+                            selected={
+                              field.value ? new Date(field.value) : undefined
+                            }
                             onSelect={field.onChange}
                             disabled={(date) =>
                               date <
@@ -420,11 +440,12 @@ export default function AddTour() {
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="endDate"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col flex-1">
+                    <FormItem className="flex flex-col">
                       <FormLabel>End Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -432,14 +453,14 @@ export default function AddTour() {
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-full pl-3 text-left font-normal",
+                                "w-full justify-start pl-3 text-left font-normal",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
                               {field.value ? (
                                 format(field.value, "PPP")
                               ) : (
-                                <span>Pick a date</span>
+                                <span>Pick an end date</span>
                               )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
@@ -448,7 +469,9 @@ export default function AddTour() {
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
-                            selected={new Date(field.value)}
+                            selected={
+                              field.value ? new Date(field.value) : undefined
+                            }
                             onSelect={field.onChange}
                             disabled={(date) =>
                               date <
@@ -466,36 +489,47 @@ export default function AddTour() {
                 />
               </div>
 
-              <div className="flex gap-5 items-stretch">
+              {/* Description + Images */}
+              <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 items-start">
                 <FormField
                   control={form.control}
                   name="description"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea {...field} className="h-51.25" />
+                        <Textarea
+                          {...field}
+                          // className="min-h-[180px] lg:min-h-[210px]"
+                          className="min-h-45 lg:min-h-52.5"
+                          placeholder="Write a short description about this tour..."
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <div className="flex-1 mt-5">
+
+                <div className="mt-0 lg:mt-6">
                   <MultipleImageUploader
                     key={uploaderKey}
                     onChange={setImages}
                   />
                 </div>
               </div>
-              <div className="border-t border-muted w-full "></div>
+
+              <div className="border-t border-muted w-full" />
+
+              {/* Included */}
               <div>
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <p className="font-semibold">Included</p>
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
                     onClick={() => appendIncluded({ value: "" })}
+                    aria-label="Add included item"
                   >
                     <Plus />
                   </Button>
@@ -510,7 +544,10 @@ export default function AddTour() {
                         render={({ field }) => (
                           <FormItem className="flex-1">
                             <FormControl>
-                              <Input {...field} />
+                              <Input
+                                {...field}
+                                placeholder={`Included item ${index + 1}`}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -522,6 +559,7 @@ export default function AddTour() {
                         className="bg-red-700"
                         size="icon"
                         type="button"
+                        aria-label="Remove included item"
                       >
                         <Trash2 />
                       </Button>
@@ -530,14 +568,16 @@ export default function AddTour() {
                 </div>
               </div>
 
+              {/* Excluded */}
               <div>
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <p className="font-semibold">Excluded</p>
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
                     onClick={() => appendExcluded({ value: "" })}
+                    aria-label="Add excluded item"
                   >
                     <Plus />
                   </Button>
@@ -552,7 +592,10 @@ export default function AddTour() {
                         render={({ field }) => (
                           <FormItem className="flex-1">
                             <FormControl>
-                              <Input {...field} />
+                              <Input
+                                {...field}
+                                placeholder={`Excluded item ${index + 1}`}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -564,6 +607,7 @@ export default function AddTour() {
                         className="bg-red-700"
                         size="icon"
                         type="button"
+                        aria-label="Remove excluded item"
                       >
                         <Trash2 />
                       </Button>
@@ -572,14 +616,16 @@ export default function AddTour() {
                 </div>
               </div>
 
+              {/* Amenities */}
               <div>
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <p className="font-semibold">Amenities</p>
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
                     onClick={() => appendAmenities({ value: "" })}
+                    aria-label="Add amenity item"
                   >
                     <Plus />
                   </Button>
@@ -594,7 +640,10 @@ export default function AddTour() {
                         render={({ field }) => (
                           <FormItem className="flex-1">
                             <FormControl>
-                              <Input {...field} />
+                              <Input
+                                {...field}
+                                placeholder={`Amenity ${index + 1}`}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -606,6 +655,7 @@ export default function AddTour() {
                         className="bg-red-700"
                         size="icon"
                         type="button"
+                        aria-label="Remove amenity item"
                       >
                         <Trash2 />
                       </Button>
@@ -614,14 +664,16 @@ export default function AddTour() {
                 </div>
               </div>
 
+              {/* Tour Plan */}
               <div>
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <p className="font-semibold">Tour Plan</p>
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
                     onClick={() => appendTourPlan({ value: "" })}
+                    aria-label="Add tour plan item"
                   >
                     <Plus />
                   </Button>
@@ -636,7 +688,10 @@ export default function AddTour() {
                         render={({ field }) => (
                           <FormItem className="flex-1">
                             <FormControl>
-                              <Input {...field} />
+                              <Input
+                                {...field}
+                                placeholder={`Day ${index + 1} plan`}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -648,6 +703,7 @@ export default function AddTour() {
                         className="bg-red-700"
                         size="icon"
                         type="button"
+                        aria-label="Remove tour plan item"
                       >
                         <Trash2 />
                       </Button>
@@ -658,6 +714,7 @@ export default function AddTour() {
             </form>
           </Form>
         </CardContent>
+
         <CardFooter className="flex justify-end">
           <Button type="submit" form="add-tour-form">
             Create Tour
