@@ -12,6 +12,8 @@ import Unauthorized from "@/pages/Unauthorized";
 import { withAuth } from "@/utils/withAuth";
 import { role } from "@/constants/role";
 import type { TRole } from "@/types";
+import Home from "@/pages/Home";
+import Tours from "@/pages/Tours";
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +21,14 @@ export const router = createBrowserRouter([
     Component: App,
     path: "/",
     children: [
+      {
+        Component: Home,
+        index: true,
+      },
+      {
+        Component: Tours,
+        path: "tours",
+      },
       {
         Component: About,
         path: "about",
