@@ -10,7 +10,7 @@ export default function CommonLayout({ children }: IProps) {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="grow container mx-auto px-4 py-16">{children}</div>
+      <div className="grow container mx-auto px-4 py-8">{children}</div>
       <Footer />
     </div>
   );
